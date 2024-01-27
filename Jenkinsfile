@@ -1,7 +1,6 @@
 pipeline {
-  agent {
-      label 'maven'
-  }
+  agent any
+  
  triggers {
        pollSCM('*/5 * * * *')
     }
