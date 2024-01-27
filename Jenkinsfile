@@ -2,7 +2,9 @@ pipeline {
   agent {
       label 'maven'
   }
-   
+  tools {
+      maven 'Maven-3.6.3' // Specify the Maven tool name
+  } 
  triggers {
        pollSCM('*/5 * * * *')
     }
