@@ -67,17 +67,20 @@ pipeline {
       }
     }
     stage('Create UAT') {
-      when {
-        expression {
-          openshift.withCluster() {
-            return !openshift.selector('dc', 'springbootapp-uat').exists()
-          }
-        }
-      }
       steps {
         script {
-          openshift.withCluster() {
+           openshift.withCluster() {
+           openshift.withProject("cicd-app") {
+          def deployment = openshift.selector("dc", "springbootapp-uat")
+                    
+          if(!deployment.exists()){
             openshift.newApp("springbootapp:latest", "--name=springbootapp-uat").narrow('svc').expose()
+          }
+          timeout(5) { 
+                openshift.selector("dc", "springbootapp-uat").related('pods').untilEach(1) {
+                  return (it.object().status.phase == "Running")
+                  }          
+              }
           }
         }
       }
