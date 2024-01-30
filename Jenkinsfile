@@ -95,19 +95,23 @@ pipeline {
         }
       }
     }
-    stage('Create PROD') {
-      when {
-        expression {
-          openshift.withCluster() {
-            return !openshift.selector('dc', 'springbootapp-prod').exists()
-          }
-        }
-      }
+    stage('Create PROD') {          
       steps {
         script {
-          openshift.withCluster() {
+           openshift.withCluster() {
+           openshift.withProject("cicd-app") {
+          def deployment = openshift.selector("dc", "springbootapp-prod")
+                    
+          if(!deployment.exists()){
             openshift.newApp("springbootapp:prod", "--name=springbootapp-prod").narrow('svc').expose()
           }
+          timeout(5) { 
+                openshift.selector("dc", "springbootapp-prod").related('pods').untilEach(1) {
+                  return (it.object().status.phase == "Running")
+                  }          
+              }
+          }
+        }
         }
       }
     }
