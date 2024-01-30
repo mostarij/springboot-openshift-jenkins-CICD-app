@@ -16,7 +16,7 @@ pipeline {
                 echo "PATH = ${M2_HOME}/bin:${PATH}"
                 echo "M2_HOME = /opt/maven"
             }
-      )
+      } 
     stage('Test App') {
       steps {
         sh "mvn clean test"
