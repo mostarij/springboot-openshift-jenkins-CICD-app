@@ -1,15 +1,22 @@
 pipeline {
-    agent {
-      label 'maven'
-  }   
-  
+  agent any
+    tools {
+        maven "MAVEN"
+        jdk "JDK"
+    }
  triggers {
        pollSCM('*/5 * * * *')
     }
   
  options { disableConcurrentBuilds() }
   
-  stages {     
+  stages {  
+    stage('Initialize'){
+            steps{
+                echo "PATH = ${M2_HOME}/bin:${PATH}"
+                echo "M2_HOME = /opt/maven"
+            }
+      
     stage('Test App') {
       steps {
         sh "mvn clean test"
